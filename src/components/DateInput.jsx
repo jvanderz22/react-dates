@@ -2,9 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { forbidExtraProps } from 'airbnb-prop-types';
 import cx from 'classnames';
-import throttle from 'lodash.throttle';
-
-import isTouchDevice from '../utils/isTouchDevice';
+import throttle from 'lodash/throttle';
+import isTouchDevice from 'is-touch-device';
 
 const propTypes = forbidExtraProps({
   id: PropTypes.string.isRequired,
@@ -38,7 +37,7 @@ const defaultProps = {
   focused: false,
   disabled: false,
   required: false,
-  readOnly: false,
+  readOnly: null,
   showCaret: false,
 
   onChange() {},
@@ -56,6 +55,7 @@ const defaultProps = {
 export default class DateInput extends React.Component {
   constructor(props) {
     super(props);
+
     this.state = {
       dateString: '',
       isTouchDevice: false,
@@ -63,6 +63,7 @@ export default class DateInput extends React.Component {
 
     this.onChange = this.onChange.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
+    this.setInputRef = this.setInputRef.bind(this);
   }
 
   componentDidMount() {
@@ -129,6 +130,10 @@ export default class DateInput extends React.Component {
     }
   }
 
+  setInputRef(ref) {
+    this.inputRef = ref;
+  }
+
   render() {
     const {
       dateString,
@@ -165,7 +170,7 @@ export default class DateInput extends React.Component {
           type="text"
           id={id}
           name={id}
-          ref={(ref) => { this.inputRef = ref; }}
+          ref={this.setInputRef}
           value={value}
           onChange={this.onChange}
           onKeyDown={throttle(this.onKeyDown, 300)}
@@ -173,7 +178,7 @@ export default class DateInput extends React.Component {
           placeholder={placeholder}
           autoComplete="off"
           disabled={disabled}
-          readOnly={readOnly || isTouch}
+          readOnly={typeof readOnly === 'boolean' ? readOnly : isTouch}
           required={required}
           aria-describedby={screenReaderMessage && screenReaderMessageId}
         />
